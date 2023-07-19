@@ -26,7 +26,7 @@ jobs:
         run: |
           forge --version
           forge install
-        id: build
+        id: install
         working-directory: contracts
 
       - name: Run Forge build
