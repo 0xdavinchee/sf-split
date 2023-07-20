@@ -1,0 +1,109 @@
+##################
+# Event Entities #
+##################
+"""
+Event: An interface which is shared by all event entities and contains basic transaction data.
+"""
+interface Event {
+    """
+    The id of the event entity.
+    """
+    id: ID!
+
+    """
+    The block number which the event was logged in.
+    """
+    blockNumber: BigInt!
+
+    """
+    The index of the event, e.g. first event emitted would have `logIndex` of 0.
+    """
+    logIndex: BigInt!
+
+    """
+    The name of the event - is a 1-to-1 match with the name in our smart contracts.
+    """
+    name: String!
+
+    """
+    The block timestamp which the event was logged in.
+    """
+    timestamp: BigInt!
+
+    """
+    The transaction hash of the transaction that the event was logged in.
+    """
+    transactionHash: Bytes!
+
+    """
+    The gas price of the transaction that the event was logged in.
+    """
+    gasPrice: BigInt!
+
+    """
+    The gas used for this transaction.
+    """
+    gasUsed: BigInt!
+}
+
+#     ConstantFlowAgreementV1    #
+"""
+FlowUpdated: An `Event` entity that is emitted
+when a flow is created, updated, or deleted.
+"""
+type FlowSplitterCreatedEvent implements Event @entity(immutable: true) {
+    # Event interface fields
+    id: ID!
+    transactionHash: Bytes!
+    gasPrice: BigInt!
+    gasUsed: BigInt!
+    timestamp: BigInt!
+    name: String!
+    blockNumber: BigInt!
+    logIndex: BigInt!
+
+    # FlowSplitterCreatedEvent fields
+    superToken: Bytes!
+    mainReceiver: Bytes!
+    sideReceiver: Bytes!
+    sideReceiverPortion: BigInt!
+    
+    # Abstract Entity Link
+    flowSplitter: FlowSplitter!
+}
+
+type SplitUpdatedEvent implements Event @entity(immutable: true) {
+    # Event interface fields
+    id: ID!
+    transactionHash: Bytes!
+    gasPrice: BigInt!
+    gasUsed: BigInt!
+    timestamp: BigInt!
+    name: String!
+    blockNumber: BigInt!
+    logIndex: BigInt!
+
+    # SplitUpdatedEvent fields
+    mainReceiverPortion: BigInt!
+    newSideReceiverPortion: BigInt!
+}
+
+###################
+# Abstract Entity #
+###################
+
+type FlowSplitter @entity {
+    id: ID!
+    createdAtTimestamp: BigInt!
+    createdAtBlockNumber: BigInt!
+    updatedAtTimestamp: BigInt!
+    updatedAtBlockNumber: BigInt!
+
+    superToken: Bytes!
+    mainReceiver: Bytes!
+    sideReceiver: Bytes!
+    sideReceiverPortion: BigInt!
+    mainReceiverPortion: BigInt!
+
+    flowSplitterCreatedEvent: FlowSplitterCreatedEvent!
+}

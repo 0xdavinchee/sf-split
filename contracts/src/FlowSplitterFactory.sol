@@ -21,12 +21,14 @@ contract FlowSplitterFactory {
         address indexed mainReceiver,
         address indexed sideReceiver,
         address flowSplitter,
+        int96 mainReceiverPortion,
         int96 sideReceiverPortion
     );
 
     /// @dev Pass address(0) when deploying to testnet/production
     constructor(ISuperfluid host_) {
         address host;
+        // this reverts when running locally
         try SuperfluidLoaderLibrary.getHost() returns (address _host) {
             host = _host;
         } catch {
@@ -54,6 +56,8 @@ contract FlowSplitterFactory {
 
         flowSplitterContract.initialize(mainReceiver_, sideReceiver_, sideReceiverPortion_, superToken_);
 
-        emit FlowSplitterCreated(superToken_, mainReceiver_, flowSplitter, sideReceiver_, sideReceiverPortion_);
+        emit FlowSplitterCreated(
+            superToken_, mainReceiver_, sideReceiver_, flowSplitter, 1000 - sideReceiverPortion_, sideReceiverPortion_
+        );
     }
 }

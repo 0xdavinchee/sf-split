@@ -1,0 +1,28 @@
+{
+  "name": "sf-split-dapp-subgraph",
+  "version": "1.0.0",
+  "description": "A subgraph for sf-split-dapp",
+  "main": "index.js",
+  "scripts": {
+    "build-local": "pnpm graph codegen && pnpm graph build",
+    "build": "pnpm graph codegen && pnpm graph build --network",
+    "test": "pnpm graph test",
+    "deploy-subgraph": "pnpm graph deploy --product hosted-service --network"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xdavinchee/sf-split.git"
+  },
+  "author": "0xdavinchee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/0xdavinchee/sf-split/issues"
+  },
+  "homepage": "https://github.com/0xdavinchee/sf-split#readme",
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.52.0",
+    "@graphprotocol/graph-ts": "^0.31.0",
+    "matchstick-as": "^0.5.2",
+    "mustache": "^4.2.0"
+  }
+}

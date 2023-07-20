@@ -1,0 +1,50 @@
+specVersion: 0.0.5
+description: Subgraph for the FlowSplitterFactory contracts
+repository: https://github.com/0xdavinchee/sf-split
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: FlowSplitterFactory
+    network: mumbai
+    source:
+      abi: FlowSplitterFactory
+      address: "0x138b3c7bae8d6e127a1f57c8c0dbfb060eba8ded"
+      startBlock: 38136303
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/flowSplitterFactory.ts
+      entities:
+        - FlowSplitterCreatedEvent
+        - FlowSplitter
+      abis:
+        - name: FlowSplitterFactory
+          file: ./abis/FlowSplitterFactory.json
+      eventHandlers:
+        - event: FlowSplitterCreated(indexed address,indexed address,indexed
+            address,address,int96,int96)
+          handler: handleFlowSplitterCreated
+          receipt: true
+templates:
+  - name: FlowSplitter
+    kind: ethereum/contract
+    network: mumbai
+    source:
+      abi: FlowSplitter
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/flowSplitter.ts
+      entities:
+        - FlowSplitter
+        - SplitUpdatedEvent
+      abis:
+        - name: FlowSplitter
+          file: ./abis/FlowSplitter.json
+      eventHandlers:
+        - event: SplitUpdated(int96,int96)
+          handler: handleSplitUpdated
+          receipt: true

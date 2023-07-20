@@ -31,6 +31,7 @@ contract FlowSplitter is SuperAppBaseFlow, Initializable {
     ISuperToken public acceptedSuperToken;
 
     error NO_NEGATIVE_PORTION();
+    error SAME_RECEIVERS_NOT_ALLOWED();
 
     /// @dev emitted when the split of the outflow to mainReceiver and sideReceiver is updated
     event SplitUpdated(int96 mainReceiverPortion, int96 newSideReceiverPortion);
@@ -44,6 +45,7 @@ contract FlowSplitter is SuperAppBaseFlow, Initializable {
         ISuperToken _acceptedSuperToken
     ) external initializer {
         if (_sideReceiverPortion < 0) revert NO_NEGATIVE_PORTION();
+        if (_mainReceiver == _sideReceiver) revert SAME_RECEIVERS_NOT_ALLOWED();
 
         mainReceiver = _mainReceiver;
         sideReceiver = _sideReceiver;
@@ -68,10 +70,14 @@ contract FlowSplitter is SuperAppBaseFlow, Initializable {
         int96 totalOutflowRate = acceptedSuperToken.getFlowRate(address(this), mainReceiver)
             + acceptedSuperToken.getFlowRate(address(this), sideReceiver);
 
+        int96 mainReceiverPortion = 1000 - newSideReceiverPortion;
+
         // update outflows
-        acceptedSuperToken.updateFlow(mainReceiver, (totalOutflowRate * (1000 - newSideReceiverPortion)) / 1000);
+        acceptedSuperToken.updateFlow(mainReceiver, (totalOutflowRate * mainReceiverPortion) / 1000);
 
         acceptedSuperToken.updateFlow(sideReceiver, (totalOutflowRate * newSideReceiverPortion) / 1000);
+
+        emit SplitUpdated(mainReceiverPortion, newSideReceiverPortion);
     }
 
     // ---------------------------------------------------------------------------------------------
