@@ -9,8 +9,8 @@ dataSources:
     network: mumbai
     source:
       abi: FlowSplitterFactory
-      address: "0x138b3c7bae8d6e127a1f57c8c0dbfb060eba8ded"
-      startBlock: 38136303
+      address: "0xf68b0122c0461bb9de02c4b1842b21cb3f107c18"
+      startBlock: 38136743
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

@@ -8,7 +8,6 @@ remappings = [
     'forge-std/=lib/forge-std/src/',
     'openzeppelin-contracts/=lib/openzeppelin-contracts/',
     '@openzeppelin/contracts=lib/openzeppelin-contracts/contracts/',
-    'super-examples/=lib/super-examples/',
     '@superfluid-finance/ethereum-contracts=lib/superfluid-protocol-monorepo/packages/ethereum-contracts'
 ]
 

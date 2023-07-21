@@ -42,6 +42,7 @@ contract FlowSplitterFactoryTest is Test {
         address flowSplitterAddress = factory.deployFlowSplitter(main, side, sidePortion, superToken);
         FlowSplitter flowSplitter = FlowSplitter(flowSplitterAddress);
 
+        assertEq(address(factory.HOST()), flowSplitter.host());
         assertEq(flowSplitter.mainReceiver(), main, "main receiver not set correctly");
         assertEq(flowSplitter.sideReceiver(), side, "side receiver not set correctly");
         assertEq(flowSplitter.sideReceiverPortion(), sidePortion, "side receiver portion not set correctly");
