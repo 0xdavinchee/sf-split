@@ -39,7 +39,7 @@ contract FlowSplitter is SuperAppBaseFlow {
     error NO_SELF_FLOW();
 
     /// @dev emitted when the split of the outflow to MAIN_RECEIVER and SIDE_RECEIVER is updated
-    event SplitUpdated(int96 mainReceiverPortion, int96 newSideReceiverPortion_);
+    event SplitUpdated(int96 mainReceiverPortion, int96 newSideReceiverPortion);
 
     constructor(
         ISuperfluid host_,

@@ -21,4 +21,4 @@ Then, you'll want to store the access token on your computer so that you can dep
 
 You also need to first create a subgraph in the graph explorer via the dashboard. You can follow along with the instructions [here](https://thegraph.com/docs/en/deploying/deploying-a-subgraph-to-hosted/#create-a-subgraph-on-the-hosted-service).
 
-To deploy, run: `pnpm deploy-subgraph <NETWORK>`
+To deploy, run: `pnpm deploy-subgraph <NETWORK>`, the graph-cli will prompt you to enter the name of your subgraph, this is what you called it in the previous step, with the format `author/subgraph-name`.
