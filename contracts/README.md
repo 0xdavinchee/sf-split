@@ -20,6 +20,8 @@ To test: `forge test`
 
 To test with TDD: `forge test --watch`
 
+To generate a coverage report, use: `forge coverage --report lcov`
+
 To deploy your contracts: 
 ```
 # To load the variables in the .env file

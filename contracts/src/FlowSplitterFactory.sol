@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
 import { FlowSplitter } from "./FlowSplitter.sol";
 import { SuperfluidLoaderLibrary } from
     "@superfluid-finance/ethereum-contracts/contracts/apps/SuperfluidLoaderLibrary.sol";
@@ -11,9 +10,6 @@ import { ISuperToken } from "@superfluid-finance/ethereum-contracts/contracts/in
 contract FlowSplitterFactory {
     /// @dev The Superfluid host contract address
     ISuperfluid public immutable HOST;
-
-    // @dev The FlowSplitter implementation contract address
-    address public immutable FLOW_SPLITTER_IMPLEMENTATION;
 
     /// @dev Emitted when a new FlowSplitter contract is deployed
     event FlowSplitterCreated(
@@ -35,7 +31,6 @@ contract FlowSplitterFactory {
             host = address(host_);
         }
         HOST = ISuperfluid(host);
-        FLOW_SPLITTER_IMPLEMENTATION = address(new FlowSplitter(HOST));
     }
 
     /// @dev Deploys a new FlowSplitter contract
@@ -45,16 +40,15 @@ contract FlowSplitterFactory {
     /// @param superToken_ The super token that will be used to send the flow
     /// @return flowSplitter The address of the deployed FlowSplitter contract
     function deployFlowSplitter(
+        ISuperToken superToken_,
         address mainReceiver_,
         address sideReceiver_,
-        int96 sideReceiverPortion_,
-        ISuperToken superToken_
+        int96 sideReceiverPortion_
     ) external returns (address flowSplitter) {
-        FlowSplitter flowSplitterContract = FlowSplitter(Clones.clone(FLOW_SPLITTER_IMPLEMENTATION));
+        FlowSplitter flowSplitterContract =
+            new FlowSplitter(HOST, superToken_, mainReceiver_, sideReceiver_, sideReceiverPortion_);
 
         flowSplitter = address(flowSplitterContract);
-
-        flowSplitterContract.initialize(mainReceiver_, sideReceiver_, sideReceiverPortion_, superToken_);
 
         emit FlowSplitterCreated(
             superToken_, mainReceiver_, sideReceiver_, flowSplitter, 1000 - sideReceiverPortion_, sideReceiverPortion_
