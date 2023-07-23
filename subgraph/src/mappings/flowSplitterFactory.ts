@@ -15,6 +15,7 @@ export function handleFlowSplitterCreated(event: FlowSplitterCreated): void {
   );
   setEventEntityValues(flowSplitterCreatedEvent, event);
   flowSplitterCreatedEvent.superToken = event.params.superToken;
+  flowSplitterCreatedEvent.flowSplitterCreator = event.params.flowSplitterCreator;
   flowSplitterCreatedEvent.mainReceiver = event.params.mainReceiver;
   flowSplitterCreatedEvent.sideReceiver = event.params.sideReceiver;
   flowSplitterCreatedEvent.sideReceiverPortion =
@@ -29,6 +30,7 @@ export function handleFlowSplitterCreated(event: FlowSplitterCreated): void {
   // Create a new FlowSplitter entity and save it to the store
   const flowSplitter = getOrInitFlowSplitter(event, event.params.flowSplitter);
   flowSplitter.superToken = event.params.superToken;
+  flowSplitter.flowSplitterCreator = event.params.flowSplitterCreator;
   flowSplitter.mainReceiver = event.params.mainReceiver;
   flowSplitter.sideReceiver = event.params.sideReceiver;
   flowSplitter.sideReceiverPortion = event.params.sideReceiverPortion;

@@ -9,8 +9,8 @@ dataSources:
     network: mumbai
     source:
       abi: FlowSplitterFactory
-      address: "0x47846405cf410e1480ae0e0e7f2900ae4e6f06f7"
-      startBlock: 38227260
+      address: "0xc0847741d1ae1bf903c269eecf236cf8df63b0bb"
+      startBlock: 38229009
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -23,8 +23,8 @@ dataSources:
         - name: FlowSplitterFactory
           file: ./abis/FlowSplitterFactory.json
       eventHandlers:
-        - event: FlowSplitterCreated(indexed address,indexed address,indexed
-            address,address,int96,int96)
+        - event: FlowSplitterCreated(indexed address,indexed
+            address,address,address,address,int96,int96)
           handler: handleFlowSplitterCreated
           receipt: true
 templates:

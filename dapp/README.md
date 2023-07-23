@@ -1,26 +1,15 @@
-This is a [RainbowKit](https://rainbowkit.com) + [wagmi](https://wagmi.sh) + [Next.js](https://nextjs.org/) project bootstrapped with [`create-rainbowkit`](https://github.com/rainbow-me/rainbowkit/tree/main/packages/create-rainbowkit).
+## Superfluid Flow Splitter dApp
 
-## Getting Started
+### Prerequisite
+- `npm` or `pnpm`
 
-First, run the development server:
+### How to use
 
-```bash
-npm run dev
-```
+First install dependencies: `pnpm install`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+To run the development server: `pnpm dev`. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-## Learn More
-
-To learn more about this stack, take a look at the following resources:
-
-- [RainbowKit Documentation](https://rainbowkit.com) - Learn how to customize your wallet connection flow.
-- [wagmi Documentation](https://wagmi.sh) - Learn how to interact with Ethereum.
-- [Next.js Documentation](https://nextjs.org/docs) - Learn how to build a Next.js application.
-
-You can check out [the RainbowKit GitHub repository](https://github.com/rainbow-me/rainbowkit) - your feedback and contributions are welcome!
+To build: `pnpm build`.
 
 ## Deploy on Vercel
 

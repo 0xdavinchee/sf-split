@@ -1,4 +1,4 @@
-## Superfluid Splitter Contracts
+## Superfluid Flow Splitter Contracts
 
 ### Prerequisite
 - forge

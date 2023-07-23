@@ -64,6 +64,7 @@ type FlowSplitterCreatedEvent implements Event @entity(immutable: true) {
 
     # FlowSplitterCreatedEvent fields
     superToken: Bytes!
+    flowSplitterCreator: Bytes!
     mainReceiver: Bytes!
     sideReceiver: Bytes!
     sideReceiverPortion: BigInt!
@@ -93,6 +94,9 @@ type SplitUpdatedEvent implements Event @entity(immutable: true) {
 ###################
 
 type FlowSplitter @entity {
+    """
+    The id is the address of the deployed flow splitter contract.
+    """
     id: ID!
     createdAtTimestamp: BigInt!
     createdAtBlockNumber: BigInt!
@@ -100,6 +104,7 @@ type FlowSplitter @entity {
     updatedAtBlockNumber: BigInt!
 
     superToken: Bytes!
+    flowSplitterCreator: Bytes!
     mainReceiver: Bytes!
     sideReceiver: Bytes!
     sideReceiverPortion: BigInt!

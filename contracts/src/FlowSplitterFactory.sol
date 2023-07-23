@@ -14,8 +14,9 @@ contract FlowSplitterFactory {
     /// @dev Emitted when a new FlowSplitter contract is deployed
     event FlowSplitterCreated(
         ISuperToken indexed superToken,
-        address indexed mainReceiver,
-        address indexed sideReceiver,
+        address indexed flowSplitterCreator,
+        address mainReceiver,
+        address sideReceiver,
         address flowSplitter,
         int96 mainReceiverPortion,
         int96 sideReceiverPortion
@@ -51,7 +52,13 @@ contract FlowSplitterFactory {
         flowSplitter = address(flowSplitterContract);
 
         emit FlowSplitterCreated(
-            superToken_, mainReceiver_, sideReceiver_, flowSplitter, 1000 - sideReceiverPortion_, sideReceiverPortion_
+            superToken_,
+            msg.sender,
+            mainReceiver_,
+            sideReceiver_,
+            flowSplitter,
+            1000 - sideReceiverPortion_,
+            sideReceiverPortion_
         );
     }
 }

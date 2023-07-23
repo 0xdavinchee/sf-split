@@ -1,8 +1,8 @@
 {
   "mumbai": {
     "FlowSplitterFactory": {
-      "address": "0x47846405cf410e1480ae0e0e7f2900ae4e6f06f7",
-      "startBlock": 38227260
+      "address": "0xc0847741d1ae1bf903c269eecf236cf8df63b0bb",
+      "startBlock": 38229009
     }
   }
 }

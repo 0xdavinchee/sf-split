@@ -74,14 +74,15 @@ contract FlowSplitter is SuperAppBaseFlow {
     /// @param sideReceiverPortion_ the portion of the inflow to be redirected to SIDE_RECEIVER
     /// @return mainFlowRate the outflow rate to MAIN_RECEIVER
     /// @return sideFlowRate the outflow rate to SIDE_RECEIVER
+    /// @return residualFlowRate the residual flow rate
     function getMainAndSideReceiverFlowRates(int96 flowRate_, int96 sideReceiverPortion_)
         external
         pure
-        returns (int96 mainFlowRate, int96 sideFlowRate, bool hasResidualFlow)
+        returns (int96 mainFlowRate, int96 sideFlowRate, int96 residualFlowRate)
     {
         mainFlowRate = (flowRate_ * (1000 - sideReceiverPortion_)) / 1000;
         sideFlowRate = (flowRate_ * sideReceiverPortion_) / 1000;
-        hasResidualFlow = (mainFlowRate + sideFlowRate) != flowRate_;
+        residualFlowRate = flowRate_ - (mainFlowRate + sideFlowRate);
     }
 
     /// @notice Updates the split of the outflow to MAIN_RECEIVER and SIDE_RECEIVER
