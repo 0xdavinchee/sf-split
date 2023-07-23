@@ -17,6 +17,9 @@ docs/
 # Dotenv file
 .env
 
+# Coverage
+lcov.info
+
 # Subgraph
 subgraph/build
 subgraph/generated
