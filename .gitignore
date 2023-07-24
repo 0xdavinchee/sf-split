@@ -26,6 +26,10 @@ subgraph/generated
 
 # Dapp
 
+# graph-client files
+dapp/.graphclient
+dapp/.next
+
 # dependencies
 **/node_modules
 /.pnp

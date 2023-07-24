@@ -1,0 +1,23 @@
+query getFlowSplitters(
+  $where: FlowSplitter_filter! = {}
+  $skip: Int! = 0
+  $first: Int! = 10
+  $orderBy: FlowSplitter_orderBy! = updatedAtTimestamp
+  $orderDirection: OrderDirection! = desc
+) {
+  result: flowSplitters(
+    where: $where
+    skip: $skip
+    first: $first
+    orderBy: $orderBy
+    orderDirection: $orderDirection
+  ) {
+    id
+    superToken
+    flowSplitterCreator
+    mainReceiver
+    sideReceiver
+    sideReceiverPortion
+    mainReceiverPortion
+  }
+}

@@ -1,9 +1,21 @@
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import type { NextPage } from "next";
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import { getTokensQuery, getBuiltGraphSDK } from "../.graphclient"
+import { useEffect } from "react";
 
-const Home: NextPage = () => {
+const Home: NextPage<{ data: getTokensQuery }> = ({ data }) => {
+  useEffect(() => {
+    (async () => {
+      const tokens = await sdk.getTokens();
+      console.log(tokens);
+      const flowSplitters = await sdk.getFlowSplitters();
+      console.log(flowSplitters);
+      const streams = await sdk.getStreams();
+      console.log(streams);
+    })();
+  }, []);
   return (
     <div className={styles.container}>
       <Head>
@@ -19,12 +31,12 @@ const Home: NextPage = () => {
         <ConnectButton />
 
         <h1 className={styles.title}>
-          Welcome to <a href="">RainbowKit</a> + <a href="">wagmi</a> +{' '}
+          Welcome to <a href="">RainbowKit</a> + <a href="">wagmi</a> +{" "}
           <a href="https://nextjs.org">Next.js!</a>
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
+          Get started by editing{" "}
           <code className={styles.code}>pages/index.tsx</code>
         </p>
 
@@ -80,5 +92,14 @@ const Home: NextPage = () => {
     </div>
   );
 };
+const sdk = getBuiltGraphSDK();
+export async function getServerSideProps() {
+  const data = await sdk.getTokens();
+  return {
+    props: {
+      data,
+    },
+  };
+}
 
 export default Home;

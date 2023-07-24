@@ -1,0 +1,11 @@
+sources:
+  - name: Mumbai-Superfluid-Protocol
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/superfluid-finance/protocol-v1-mumbai
+  - name: Mumbai-0xdavinchee-FlowSplitter
+    handler:
+      graphql:
+        endpoint: https://api.thegraph.com/subgraphs/name/0xdavinchee/mumbai-sf-split-dapp
+
+documents: ["./graphql/*"]
