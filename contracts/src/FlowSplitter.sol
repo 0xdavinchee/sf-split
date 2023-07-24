@@ -23,8 +23,11 @@ contract FlowSplitter is SuperAppBaseFlow {
     /// @dev Account that ought to be routed the majority of the inflows
     address public immutable MAIN_RECEIVER;
 
-    /// @dev Accout that ought to be routed the minority of the inflows
+    /// @dev Account that ought to be routed the minority of the inflows
     address public immutable SIDE_RECEIVER;
+
+    /// @dev Account that deployed the contract
+    address public immutable CREATOR;
 
     /// @dev Super Token that the FlowSplitter will accept streams of
     ISuperToken public immutable ACCEPTED_SUPER_TOKEN;
@@ -36,6 +39,7 @@ contract FlowSplitter is SuperAppBaseFlow {
     error INVALID_PORTION();
     error SAME_RECEIVERS_NOT_ALLOWED();
     error NO_SELF_FLOW();
+    error NOT_CREATOR();
 
     /// @dev emitted when the split of the outflow to MAIN_RECEIVER and SIDE_RECEIVER is updated
     event SplitUpdated(int96 mainReceiverPortion, int96 newSideReceiverPortion);
@@ -43,6 +47,7 @@ contract FlowSplitter is SuperAppBaseFlow {
     constructor(
         ISuperfluid host_,
         ISuperToken acceptedSuperToken_,
+        address creator_,
         address mainReceiver_,
         address sideReceiver_,
         int96 sideReceiverPortion_
@@ -52,6 +57,7 @@ contract FlowSplitter is SuperAppBaseFlow {
         if (mainReceiver_ == address(this) || sideReceiver_ == address(this)) revert NO_SELF_FLOW();
 
         ACCEPTED_SUPER_TOKEN = acceptedSuperToken_;
+        CREATOR = creator_;
         MAIN_RECEIVER = mainReceiver_;
         SIDE_RECEIVER = sideReceiver_;
         sideReceiverPortion = sideReceiverPortion_;
@@ -89,6 +95,7 @@ contract FlowSplitter is SuperAppBaseFlow {
     /// @param newSideReceiverPortion_ the new portion of inflows to be redirected to SIDE_RECEIVER
     function updateSplit(int96 newSideReceiverPortion_) external {
         if (newSideReceiverPortion_ <= 0 || newSideReceiverPortion_ == 1000) revert INVALID_PORTION();
+        if (msg.sender != CREATOR) revert NOT_CREATOR();
 
         sideReceiverPortion = newSideReceiverPortion_;
 

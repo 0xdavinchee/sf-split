@@ -71,6 +71,19 @@ contract FlowSplitterFactoryTest is Test {
         vm.stopPrank();
     }
 
+    function testRevertIfUpdateSplitAsNotOwner(address main_, address side_, int96 sidePortion_) public {
+        _assumeValidMainAndSideAddresses(main_, side_);
+        sidePortion_ = _boundValidSidePortion(sidePortion_);
+
+        address flowSplitterAddress = _helperDeployFlowSplitter(_superToken, main_, side_, 420);
+        FlowSplitter flowSplitter = FlowSplitter(flowSplitterAddress);
+
+        vm.startPrank(main_);
+        vm.expectRevert(FlowSplitter.NOT_CREATOR.selector);
+        flowSplitter.updateSplit(sidePortion_);
+        vm.stopPrank();
+    }
+
     function testFlowSplitterFactoryDeployedProperly() public {
         assertEq(address(_factory.HOST()), address(_sf.host), "host not set correctly");
     }

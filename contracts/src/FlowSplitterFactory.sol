@@ -47,7 +47,7 @@ contract FlowSplitterFactory {
         int96 sideReceiverPortion_
     ) external returns (address flowSplitter) {
         FlowSplitter flowSplitterContract =
-            new FlowSplitter(HOST, superToken_, mainReceiver_, sideReceiver_, sideReceiverPortion_);
+            new FlowSplitter(HOST, superToken_, msg.sender, mainReceiver_, sideReceiver_, sideReceiverPortion_);
 
         flowSplitter = address(flowSplitterContract);
 
