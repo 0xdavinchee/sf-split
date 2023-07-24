@@ -13,9 +13,10 @@ export function handleFlowSplitterCreated(event: FlowSplitterCreated): void {
   let flowSplitterCreatedEvent = new FlowSplitterCreatedEvent(
     createEventID("FlowSplitterCreated", event)
   );
-  setEventEntityValues(flowSplitterCreatedEvent, event);
+  setEventEntityValues(flowSplitterCreatedEvent, event, []);
   flowSplitterCreatedEvent.superToken = event.params.superToken;
-  flowSplitterCreatedEvent.flowSplitterCreator = event.params.flowSplitterCreator;
+  flowSplitterCreatedEvent.flowSplitterCreator =
+    event.params.flowSplitterCreator;
   flowSplitterCreatedEvent.mainReceiver = event.params.mainReceiver;
   flowSplitterCreatedEvent.sideReceiver = event.params.sideReceiver;
   flowSplitterCreatedEvent.sideReceiverPortion =

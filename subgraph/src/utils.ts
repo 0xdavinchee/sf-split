@@ -7,6 +7,14 @@ import {
 } from "@graphprotocol/graph-ts";
 import { FlowSplitter } from "../generated/schema";
 
+/**************************************************************************
+ * Constants
+ *************************************************************************/
+export const ORDER_MULTIPLIER = BigInt.fromI32(10000);
+
+/**************************************************************************
+ * Event entities util functions
+ *************************************************************************/
 export function createEventID(
   eventName: string,
   event: ethereum.Event
@@ -21,6 +29,15 @@ export function createEventID(
 }
 
 /**
+ * getOrder calculate order based on {blockNumber.times(10000).plus(logIndex)}.
+ * @param blockNumber
+ * @param logIndex
+ */
+export function getOrder(blockNumber: BigInt, logIndex: BigInt): BigInt {
+  return blockNumber.times(ORDER_MULTIPLIER).plus(logIndex);
+}
+
+/**
  * Sets the Event interface values on the event entity.
  * @param entity the Entity
  * @param event the ethereum.Event object
@@ -28,7 +45,8 @@ export function createEventID(
  */
 export function setEventEntityValues(
   entity: Entity,
-  event: ethereum.Event
+  event: ethereum.Event,
+  addresses: Bytes[]
 ): Entity {
   const idValue = entity.get("id");
   if (!idValue) return entity;
@@ -38,7 +56,12 @@ export function setEventEntityValues(
 
   entity.set("blockNumber", Value.fromBigInt(event.block.number));
   entity.set("logIndex", Value.fromBigInt(event.logIndex));
+  entity.set(
+    "order",
+    Value.fromBigInt(getOrder(event.block.number, event.logIndex))
+  );
   entity.set("name", Value.fromString(name));
+  entity.set("addresses", Value.fromBytesArray(addresses));
   entity.set("timestamp", Value.fromBigInt(event.block.timestamp));
   entity.set("transactionHash", Value.fromBytes(event.transaction.hash));
   entity.set("gasPrice", Value.fromBigInt(event.transaction.gasPrice));
@@ -50,6 +73,9 @@ export function setEventEntityValues(
   return entity;
 }
 
+/**************************************************************************
+ * Abstract entities util functions
+ *************************************************************************/
 export function getOrInitFlowSplitter(
   event: ethereum.Event,
   flowSplitterAddress: Bytes

@@ -10,7 +10,7 @@ export function handleSplitUpdated(event: SplitUpdated): void {
   const splitUpdatedEvent = new SplitUpdatedEvent(
     createEventID("SplitUpdated", event)
   );
-  setEventEntityValues(splitUpdatedEvent, event);
+  setEventEntityValues(splitUpdatedEvent, event, []);
   splitUpdatedEvent.mainReceiverPortion = event.params.mainReceiverPortion;
   splitUpdatedEvent.newSideReceiverPortion =
     event.params.newSideReceiverPortion;

@@ -21,9 +21,22 @@ interface Event {
     logIndex: BigInt!
 
     """
+    A number used internally to sort the order of transactions.
+    The formula: `blockNumber * ORDER_MULTIPLIER + logIndex`
+    where: ORDER_MULTIPLIER = 10000
+    """
+    order: BigInt!
+
+    """
     The name of the event - is a 1-to-1 match with the name in our smart contracts.
     """
     name: String!
+
+    """
+    Contains the addresses for accounts that were "impacted" by the event.
+    This typically involves accounts which experienced a state change as a result of the transaction which emitted this event.
+    """
+    addresses: [Bytes!]!
 
     """
     The block timestamp which the event was logged in.
@@ -59,8 +72,10 @@ type FlowSplitterCreatedEvent implements Event @entity(immutable: true) {
     gasUsed: BigInt!
     timestamp: BigInt!
     name: String!
+    addresses: [Bytes!]!
     blockNumber: BigInt!
     logIndex: BigInt!
+    order: BigInt!
 
     # FlowSplitterCreatedEvent fields
     superToken: Bytes!
@@ -81,8 +96,10 @@ type SplitUpdatedEvent implements Event @entity(immutable: true) {
     gasUsed: BigInt!
     timestamp: BigInt!
     name: String!
+    addresses: [Bytes!]!
     blockNumber: BigInt!
     logIndex: BigInt!
+    order: BigInt!
 
     # SplitUpdatedEvent fields
     mainReceiverPortion: BigInt!
