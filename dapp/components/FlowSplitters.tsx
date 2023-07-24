@@ -17,6 +17,7 @@ const FlowSplitters = (props: FlowSplittersProps) => {
     }
   }, [props.address]);
 
+  // TODO: figure out how to get this to work
   const filteredSplitters = useMemo(() => {
     if (selected) {
       return props.flowSplitters.filter((x) => x.creator === props.address);
@@ -26,35 +27,33 @@ const FlowSplitters = (props: FlowSplittersProps) => {
   }, [selected, props.flowSplitters]);
 
   return (
-    <div style={{height: "500px"}}>
+    <div style={{ height: "500px" }}>
       <Typography variant="h4">Flow Splitters</Typography>
       <Card elevation={3}>
-      {props.address && (
-          <CardContent>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <ToggleButton
-                value="check"
-                selected={selected}
-                onChange={() => {
-                  setSelected(!selected);
-                }}
-              >
-                <CheckIcon fontSize="small" />
-              </ToggleButton>
-              <Typography marginLeft={1} variant="body1">
-                Only display my deployed flow splitters
-              </Typography>
-            </div>
-          </CardContent>
-        )}
+        {/* TODO: figure out how to only display if address is visible */}
+        <CardContent>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <ToggleButton
+              value="check"
+              selected={selected}
+              onChange={() => {
+                setSelected(!selected);
+              }}
+            >
+              <CheckIcon fontSize="small" />
+            </ToggleButton>
+            <Typography marginLeft={1} variant="body1">
+              Only display my deployed flow splitters
+            </Typography>
+          </div>
+        </CardContent>
         <CardContent>
           <div>
-            {filteredSplitters.map((x) => (
+            {props.flowSplitters.map((x) => (
               <FlowSplitter {...x} />
             ))}
           </div>
         </CardContent>
-        
       </Card>
     </div>
   );

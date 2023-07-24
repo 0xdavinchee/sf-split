@@ -12,7 +12,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
   [polygonMumbai],
   [publicProvider()]
 );
-console.log(process.env)
+
 const { connectors } = getDefaultWallets({
   appName: "SF Split dApp",
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",

@@ -3,23 +3,23 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { getTokensQuery, getBuiltGraphSDK } from "../.graphclient";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Paper } from "@mui/material";
 import { FlowSplitterProps } from "../components/FlowSplitter";
 import { useAccount } from "wagmi";
 import FlowSplitters from "../components/FlowSplitters";
+import CreateFlowSplitter from "../components/CreateFlowSplitter";
 
 const Home: NextPage<{ data: getTokensQuery }> = ({ data }) => {
   const { address } = useAccount();
+  const [tokens, setTokens] = useState<getTokensQuery>();
 
   useEffect(() => {
     (async () => {
-      const tokens = await sdk.getTokens();
-      console.log(tokens);
+      const tokens = await sdk.getTokens({ where: { isListed: true } });
+      setTokens(tokens);
       const flowSplitters = await sdk.getFlowSplitters();
-      console.log(flowSplitters);
       const streams = await sdk.getStreams();
-      console.log(streams);
     })();
   }, []);
 
@@ -58,6 +58,7 @@ const Home: NextPage<{ data: getTokensQuery }> = ({ data }) => {
       <main className={styles.main}>
         <ConnectButton />
         <FlowSplitters address={address} flowSplitters={flowSplitters} />
+        <CreateFlowSplitter tokens={tokens} />
       </main>
 
       <footer className={styles.footer}>
