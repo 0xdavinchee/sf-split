@@ -15,7 +15,7 @@ const Streams = (props: StreamsProps) => {
           {props.streams?.result.length === 0 ? (
             <div>
               <Typography color="GrayText" variant="body2">
-                You don't have any streams to Flow Splitters created via this
+                You don&apos;t have any streams to Flow Splitters created via this
                 factory.
               </Typography>
             </div>

@@ -78,7 +78,7 @@ const CreateFlowSplitter = (props: CreateFlowSplitterProps) => {
     if (data) {
       props.handleClose();
     }
-  }, [data]);
+  }, [data, props]);
 
   const isBadAddressInput = (address: string) =>
     address !== "" && !isAddress(address) && address.length === 42;

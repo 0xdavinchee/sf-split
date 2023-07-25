@@ -43,7 +43,7 @@ const Home: NextPage = () => {
       await getAndSetFlowSplittersAndStreams(address);
       setLoading(false);
     })();
-  }, [address]);
+  }, [address, tokenMap]);
 
   useEffect(() => {
     if (loading) return;

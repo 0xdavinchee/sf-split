@@ -12,6 +12,7 @@ import {
   useCfAv1ForwarderCreateFlow,
   useCfAv1ForwarderGetFlowrate,
   useCfAv1ForwarderUpdateFlow,
+  useFlowSplitterGetMainAndSideReceiverFlowRates,
   useFlowSplitterUpdateSplit,
   usePrepareCfAv1ForwarderCreateFlow,
   usePrepareCfAv1ForwarderUpdateFlow,
@@ -77,6 +78,32 @@ const FlowSplitter = (props: FlowSplitterProps) => {
     return flowRate !== "" && Number(flowRate) > 1000;
   }, [flowRate]);
 
+  const validFlowRate = useMemo(() => {
+    return isNaN(Number(flowRate)) ? BigInt(0) : BigInt(flowRate);
+  }, [flowRate]);
+
+  const validSideReceiverPortion = useMemo(() => {
+    return isNaN(Number(sideReceiverPortion))
+      ? BigInt(0)
+      : BigInt(sideReceiverPortion);
+  }, [sideReceiverPortion]);
+
+  const { data: mainAndSideReceiverFlowRates } =
+    useFlowSplitterGetMainAndSideReceiverFlowRates({
+      ...flowSplitterContract,
+      args: [validFlowRate, validSideReceiverPortion],
+      enabled: more && isValidFlowRate && isValidSideReceiverPortion,
+    });
+
+  const canModifyFlow = useMemo(() => {
+    if (mainAndSideReceiverFlowRates == null) return false;
+
+    const mainReceiverFlowRate = mainAndSideReceiverFlowRates[0];
+    const sideReceiverFlowRate = mainAndSideReceiverFlowRates[1];
+
+    return Number(mainReceiverFlowRate) > 0 && Number(sideReceiverFlowRate) > 0;
+  }, [mainAndSideReceiverFlowRates]);
+
   const { data: inflowToFlowSplitter } = useCfAv1ForwarderGetFlowrate({
     ...CFAv1ForwarderContract,
     args: [
@@ -96,14 +123,18 @@ const FlowSplitter = (props: FlowSplitterProps) => {
       ? getAddress(props.address)
       : "0x",
     isAddress(flowSplitter.id) ? getAddress(flowSplitter.id) : "0x",
-    isNaN(Number(flowRate)) ? BigInt(0) : BigInt(flowRate),
+    validFlowRate,
     "0x",
   ] as ModifyFlowArgsType;
 
   const { config: createFlowConfig } = usePrepareCfAv1ForwarderCreateFlow({
     ...CFAv1ForwarderContract,
     args: modifyFlowArgs,
-    enabled: more && isValidFlowRate && Number(inflowToFlowSplitter) === 0,
+    enabled:
+      more &&
+      canModifyFlow &&
+      isValidFlowRate &&
+      Number(inflowToFlowSplitter) === 0,
   });
   const { writeAsync: createFlowWrite } =
     useCfAv1ForwarderCreateFlow(createFlowConfig);
@@ -111,7 +142,11 @@ const FlowSplitter = (props: FlowSplitterProps) => {
   const { config: updateFlowConfig } = usePrepareCfAv1ForwarderUpdateFlow({
     ...CFAv1ForwarderContract,
     args: modifyFlowArgs,
-    enabled: more && isValidFlowRate && Number(inflowToFlowSplitter) > 0,
+    enabled:
+      more &&
+      canModifyFlow &&
+      isValidFlowRate &&
+      Number(inflowToFlowSplitter) > 0,
   });
   const { writeAsync: updateFlowWrite } =
     useCfAv1ForwarderUpdateFlow(updateFlowConfig);
@@ -128,11 +163,7 @@ const FlowSplitter = (props: FlowSplitterProps) => {
 
   const { config: updateSplitConfig } = usePrepareFlowSplitterUpdateSplit({
     ...flowSplitterContract,
-    args: [
-      isNaN(Number(sideReceiverPortion))
-        ? BigInt(0)
-        : BigInt(sideReceiverPortion),
-    ],
+    args: [validSideReceiverPortion],
     enabled: isValidSideReceiverPortion,
   });
 
@@ -198,7 +229,7 @@ const FlowSplitter = (props: FlowSplitterProps) => {
               label="Flow Rate (per second)"
               variant="outlined"
               value={flowRate}
-              error={!isValidFlowRate && flowRate !== ""}
+              error={(!isValidFlowRate || !canModifyFlow) && flowRate !== ""}
               onChange={(e) => setFlowRate(e.target.value)}
             />
 
@@ -206,7 +237,7 @@ const FlowSplitter = (props: FlowSplitterProps) => {
               size="small"
               variant="contained"
               color="primary"
-              disabled={!isValidFlowRate}
+              disabled={!isValidFlowRate || !canModifyFlow}
               onClick={() => handleStreamToFlowSplitter()}
             >
               Stream to flow splitter

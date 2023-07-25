@@ -27,7 +27,7 @@ const FlowSplitters = (props: FlowSplittersProps) => {
     } else {
       return props.flowSplitters?.result;
     }
-  }, [selected, props.flowSplitters]);
+  }, [selected, props.flowSplitters, props.address]);
 
   return (
     <div>
