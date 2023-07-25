@@ -7,5 +7,5 @@ export const CFAv1ForwarderContract = {
 
 export const FlowSplitterFactoryContract = {
     flowSplitterFactoryABI,
-    address: "0xf56eb4efd2498390764e0ba85047086e2ae9b86b" as any,
+    address: "0x7167d60bb1fa2b7718fd15a72bcab2f0718a5523" as any,
 }
