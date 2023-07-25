@@ -31,10 +31,18 @@ We have a Flow Splitter contract, no easy way to deploy, view and interact with 
 # Technical Solution
 
 - Flow Splitter Factory smart contract
-- Flow Splitter contract (modified)
+- Modified Flow Splitter contract (refer to README.md)
 - Subgraph
 - Query SDK (graph-client)
 - dApp (consumes wagmi hooks + Query SDK)
+
+---
+
+# Features
+
+- Create Flow Splitter
+- Update Flow Split
+- View Deployed Flow Splitters + Open Streams 
 
 ---
 
