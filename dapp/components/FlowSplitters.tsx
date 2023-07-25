@@ -1,15 +1,21 @@
-import { Typography, Card, CardContent, ToggleButton } from "@mui/material";
-import FlowSplitter, { FlowSplitterProps } from "./FlowSplitter";
-import CheckIcon from "@mui/icons-material/Check";
+import {
+  Typography,
+  Card,
+  CardContent,
+  Button,
+} from "@mui/material";
+import FlowSplitter from "./FlowSplitter";
 import { useEffect, useMemo, useState } from "react";
+import { getFlowSplittersQuery } from "../.graphclient";
 
 export interface FlowSplittersProps {
-  readonly flowSplitters: FlowSplitterProps[];
+  readonly openModal: () => void;
+  readonly flowSplitters?: getFlowSplittersQuery;
   readonly address?: string;
 }
 
 const FlowSplitters = (props: FlowSplittersProps) => {
-  const [selected, setSelected] = useState(props.address ? true : false);
+  const [selected, setSelected] = useState(false);
 
   useEffect(() => {
     if (props.address) {
@@ -17,42 +23,42 @@ const FlowSplitters = (props: FlowSplittersProps) => {
     }
   }, [props.address]);
 
-  // TODO: figure out how to get this to work
-  const filteredSplitters = useMemo(() => {
-    if (selected) {
-      return props.flowSplitters.filter((x) => x.creator === props.address);
-    } else {
-      return props.flowSplitters;
-    }
-  }, [selected, props.flowSplitters]);
-
   return (
-    <div style={{ height: "500px" }}>
-      <Typography variant="h4">Flow Splitters</Typography>
+    <div>
+      <Typography marginBottom={1} variant="h4">
+        Flow Splitters
+      </Typography>
       <Card elevation={3}>
-        {/* TODO: figure out how to only display if address is visible */}
         <CardContent>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <ToggleButton
-              value="check"
-              selected={selected}
-              onChange={() => {
-                setSelected(!selected);
-              }}
-            >
-              <CheckIcon fontSize="small" />
-            </ToggleButton>
-            <Typography marginLeft={1} variant="body1">
-              Only display my deployed flow splitters
-            </Typography>
-          </div>
-        </CardContent>
-        <CardContent>
-          <div>
-            {props.flowSplitters.map((x) => (
-              <FlowSplitter {...x} />
-            ))}
-          </div>
+          {props.flowSplitters?.result.length === 0 ? (
+            <div>
+              <Typography color="GrayText" variant="body2">
+                There are no flow splitters to display.
+              </Typography>
+              <Button
+                style={{ marginTop: 10 }}
+                variant="outlined"
+                color="primary"
+                onClick={() => props.openModal()}
+              >
+                Create a Flow Splitter
+              </Button>
+            </div>
+          ) : (
+            <div>
+              {props.flowSplitters?.result.map((x) => (
+                <FlowSplitter key={x.id} {...x} />
+              ))}
+              <Button
+                style={{ marginTop: 10 }}
+                variant="outlined"
+                color="primary"
+                onClick={() => props.openModal()}
+              >
+                Create a Flow Splitter
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

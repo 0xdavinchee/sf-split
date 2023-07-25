@@ -2,47 +2,78 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
-import { getTokensQuery, getBuiltGraphSDK } from "../.graphclient";
+import {
+  getTokensQuery,
+  getBuiltGraphSDK,
+  getStreamsQuery,
+  getFlowSplittersQuery,
+} from "../.graphclient";
 import { useEffect, useState } from "react";
-import { Paper } from "@mui/material";
-import { FlowSplitterProps } from "../components/FlowSplitter";
+import { Modal, Paper, Typography } from "@mui/material";
 import { useAccount } from "wagmi";
 import FlowSplitters from "../components/FlowSplitters";
 import CreateFlowSplitter from "../components/CreateFlowSplitter";
+import Streams from "../components/Streams";
+import { FlowSplitterFactoryContract } from "../src/constants";
+import Summary from "../components/Summary";
 
-const Home: NextPage<{ data: getTokensQuery }> = ({ data }) => {
+const sdk = getBuiltGraphSDK();
+
+const Home: NextPage = () => {
   const { address } = useAccount();
+  const [modalOpen, setModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState<getTokensQuery>();
+  const [streams, setStreams] = useState<getStreamsQuery>();
+  const [flowSplitters, setFlowSplitters] = useState<getFlowSplittersQuery>();
 
   useEffect(() => {
-    (async () => {
-      const tokens = await sdk.getTokens({ where: { isListed: true } });
-      setTokens(tokens);
-      const flowSplitters = await sdk.getFlowSplitters();
-      const streams = await sdk.getStreams();
-    })();
-  }, []);
+    if (address) {
+      (async () => {
+        const tokens = await sdk.getTokens({ where: { isListed: true } });
+        setTokens(tokens);
+        await getAndSetFlowSplittersAndStreams(address);
+        setLoading(false);
+      })();
+    }
+  }, [address]);
 
-  const flowSplitters: FlowSplitterProps[] = [
-    {
-      id: "0x12F50528177E7934F46716023500b206732D3Ae4",
-      token: "0x5C99F2c1EE10E9fF1448DEf4948eCd18065Bced2",
-      mainReceiver: "0x688390820B57cd65c1f76B5509Ba28F79A343343",
-      sideReceiver: "0xE0cc76334405EE8b39213E620587d815967af39C",
-      mainReceiverPortion: 420,
-      sideReceiverPortion: 580,
-      creator: "0x5C99F2c1EE10E9fF1448DEf4948eCd18065Bced2",
-    },
-    {
-      id: "0x5C99F2c1EE10E9fF1448DEf4948eCd18065Bced2",
-      token: "0x12F50528177E7934F46716023500b206732D3Ae4",
-      mainReceiver: "0x6EeE6060f715257b970700bc2656De21dEdF074C",
-      sideReceiver: "0x688390820B57cd65c1f76B5509Ba28F79A343343",
-      mainReceiverPortion: 420,
-      sideReceiverPortion: 580,
-      creator: "0xE0cc76334405EE8b39213E620587d815967af39C",
-    },
-  ];
+  useEffect(() => {
+    if (loading) return;
+
+    const intervalId = setInterval(async () => {
+      await getAndSetFlowSplittersAndStreams(address);
+    }, 3000);
+    return () => clearInterval(intervalId);
+  }, [loading, address]);
+
+  const getAndSetFlowSplittersAndStreams = async (
+    connectedAddress?: string
+  ) => {
+    const flowSplitters = await sdk.getFlowSplitters({
+      where: {
+        flowSplitterCreator: connectedAddress
+          ? connectedAddress.toLowerCase()
+          : "",
+      },
+    });
+    setFlowSplitters(flowSplitters);
+    const flowSplitterAddresses = flowSplitters.result.map((x) =>
+      x.id.toLowerCase()
+    );
+    const streams = await sdk.getStreams({
+      where: {
+        currentFlowRate_gt: 0,
+        sender: connectedAddress ? connectedAddress.toLowerCase() : "",
+        receiver_in: flowSplitterAddresses,
+      },
+    });
+    setStreams(streams);
+  };
+
+  console.log(modalOpen);
+  const handleOpen = () => setModalOpen(true);
+  const handleClose = () => setModalOpen(false);
 
   return (
     <Paper className={styles.container}>
@@ -57,26 +88,44 @@ const Home: NextPage<{ data: getTokensQuery }> = ({ data }) => {
 
       <main className={styles.main}>
         <ConnectButton />
-        <FlowSplitters address={address} flowSplitters={flowSplitters} />
-        <CreateFlowSplitter tokens={tokens} />
+        <Summary />
+        <Typography marginY={2} variant="body2" color="GrayText">
+          Factory Address: {FlowSplitterFactoryContract.address}
+        </Typography>
+        {loading ? (
+          <div>
+            <Typography>Loading...</Typography>
+          </div>
+        ) : (
+          <div>
+            <FlowSplitters
+              address={address}
+              flowSplitters={flowSplitters}
+              openModal={() => handleOpen()}
+            />
+            <Streams streams={streams} />
+          </div>
+        )}
+        <Modal
+          open={modalOpen}
+          onClose={handleClose}
+          aria-labelledby="modal-create-flow-splitter"
+          aria-describedby="modal-create-flow-splitters"
+        >
+          <CreateFlowSplitter address={address} tokens={tokens} />
+        </Modal>
       </main>
 
       <footer className={styles.footer}>
-        <a href="https://rainbow.me" rel="noopener noreferrer" target="_blank">
+        <a
+          href="https://vincentchee.com"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           Made with ❤️ by your fren, 0xdavinchee
         </a>
       </footer>
     </Paper>
   );
 };
-const sdk = getBuiltGraphSDK();
-export async function getServerSideProps() {
-  const data = await sdk.getTokens();
-  return {
-    props: {
-      data,
-    },
-  };
-}
-
 export default Home;

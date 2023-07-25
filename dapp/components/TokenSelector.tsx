@@ -1,34 +1,48 @@
 import {
-  Card,
-  CardContent,
   FormControl,
   FormHelperText,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
-  Typography,
 } from "@mui/material";
+import { erc20ABI } from "wagmi";
 import { getTokensQuery } from "../.graphclient";
-import { useState } from "react";
+import { useErc20BalanceOf } from "../src/generated";
+import { formatEther, getAddress, isAddress } from "viem";
 
 interface TokenSelectProps {
   readonly tokens?: getTokensQuery;
+  readonly selectedToken: string;
+  readonly address?: `0x${string}`;
+  readonly setToken: (token: string) => void;
 }
 
 const TokenSelect = (props: TokenSelectProps) => {
-  const [token, setToken] = useState("");
-
   const handleChange = (event: SelectChangeEvent) => {
-    setToken(event.target.value);
+    props.setToken(event.target.value);
   };
+
+  const tokenContract = {
+    address: isAddress(props.selectedToken)
+      ? getAddress(props.selectedToken)
+      : ("" as any),
+    erc20ABI,
+  };
+
+  const { data, isFetchedAfterMount } = useErc20BalanceOf({
+    ...tokenContract,
+    args: [props.address ? props.address : "0x"],
+    enabled: props.address && isAddress(props.address),
+  });
+
   return (
     <FormControl sx={{ m: 1 }}>
       <InputLabel id="select-super-token-label">Token</InputLabel>
       <Select
         labelId="select-super-token-label"
         id="select-super-token"
-        value={token}
+        value={props.selectedToken}
         label="Token"
         onChange={handleChange}
       >
@@ -41,7 +55,14 @@ const TokenSelect = (props: TokenSelectProps) => {
           </MenuItem>
         ))}
       </Select>
-      {token == "" && <FormHelperText>Select a SuperToken</FormHelperText>}
+      {isFetchedAfterMount && data != null && props.selectedToken !== "" && (
+        <FormHelperText>
+          Token Balance: {Number(formatEther(data, "wei")).toFixed(6)}
+        </FormHelperText>
+      )}
+      {props.selectedToken == "" && (
+        <FormHelperText>Select a SuperToken</FormHelperText>
+      )}
     </FormControl>
   );
 };

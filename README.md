@@ -43,3 +43,7 @@ To address this issue, we will implement a solution that integrates a user-frien
   - Utilizes tools allowing straightforward deployment to multiple networks.
 
 This technical design outlines the key components, from smart contracts and subgraph integration to frontend development and cross-network deployment. 
+
+## Misc
+
+[FlowSplitter contract changeset](https://github.com/superfluid-finance/super-examples/compare/flow-splitter-changes?expand=1)

@@ -5,8 +5,7 @@ import { SuperTokenV1Library } from "@superfluid-finance/ethereum-contracts/cont
 import { SuperAppBaseFlow } from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperAppBaseFlow.sol";
 import {
     ISuperfluid,
-    ISuperToken,
-    SuperAppDefinitions
+    ISuperToken
 } from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluid.sol";
 
 /// @title FlowSplitter
@@ -91,7 +90,7 @@ contract FlowSplitter is SuperAppBaseFlow {
     }
 
     /// @notice Updates the split of the outflow to MAIN_RECEIVER and SIDE_RECEIVER
-    /// @dev Anyone can call this function!
+    /// @dev Only the creator should be able to call update split.
     /// @param newSideReceiverPortion_ the new portion of inflows to be redirected to SIDE_RECEIVER
     function updateSplit(int96 newSideReceiverPortion_) external {
         if (newSideReceiverPortion_ <= 0 || newSideReceiverPortion_ == 1000) revert INVALID_PORTION();
@@ -106,9 +105,16 @@ contract FlowSplitter is SuperAppBaseFlow {
         int96 mainReceiverPortion = 1000 - newSideReceiverPortion_;
 
         // update outflows
-        ACCEPTED_SUPER_TOKEN.updateFlow(MAIN_RECEIVER, (totalOutflowRate * mainReceiverPortion) / 1000);
-
-        ACCEPTED_SUPER_TOKEN.updateFlow(SIDE_RECEIVER, (totalOutflowRate * newSideReceiverPortion_) / 1000);
+        // @note there was a peculiar bug here where decreasing the portion doesn't always work
+        // as the flow sent to main receiver is greater than before while the side receiver portion is
+        // the same. this leads to the super app reverting due to not enough buffer to do so.
+        if (mainReceiverPortion > newSideReceiverPortion_) {
+            ACCEPTED_SUPER_TOKEN.updateFlow(MAIN_RECEIVER, (totalOutflowRate * mainReceiverPortion) / 1000);
+            ACCEPTED_SUPER_TOKEN.updateFlow(SIDE_RECEIVER, (totalOutflowRate * newSideReceiverPortion_) / 1000);
+        } else {
+            ACCEPTED_SUPER_TOKEN.updateFlow(SIDE_RECEIVER, (totalOutflowRate * newSideReceiverPortion_) / 1000);
+            ACCEPTED_SUPER_TOKEN.updateFlow(MAIN_RECEIVER, (totalOutflowRate * mainReceiverPortion) / 1000);
+        }
 
         emit SplitUpdated(mainReceiverPortion, newSideReceiverPortion_);
     }
