@@ -60,8 +60,8 @@ const CreateFlowSplitter = (props: CreateFlowSplitterProps) => {
         isAddress(mainReceiver) ? getAddress(mainReceiver) : "0x",
         isAddress(sideReceiver) ? getAddress(sideReceiver) : "0x",
         isNaN(Number(sideReceiverPortion))
-        ? BigInt(0)
-        : BigInt(sideReceiverPortion),
+          ? BigInt(0)
+          : BigInt(sideReceiverPortion),
       ],
       enabled,
     });
@@ -134,7 +134,7 @@ const CreateFlowSplitter = (props: CreateFlowSplitterProps) => {
             <TextField
               style={{ marginBottom: 10 }}
               id="set-side-receiver-portion"
-              label="Side Receiver Portion (1-999)"
+              label="Side Receiver Portion (1 - 999)"
               type="number"
               variant="outlined"
               size="small"

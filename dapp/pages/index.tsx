@@ -9,28 +9,37 @@ import {
   getFlowSplittersQuery,
 } from "../.graphclient";
 import { useEffect, useState } from "react";
-import { Modal, Paper, Typography } from "@mui/material";
-import { useAccount } from "wagmi";
+import { Link, Paper, Typography } from "@mui/material";
+import { useAccount, useNetwork } from "wagmi";
 import FlowSplitters from "../components/FlowSplitters";
 import CreateFlowSplitter from "../components/CreateFlowSplitter";
 import Streams from "../components/Streams";
 import { FlowSplitterFactoryContract } from "../src/constants";
 import Summary from "../components/Summary";
+import { getAddressLink } from "../src/helpers";
 
 const sdk = getBuiltGraphSDK();
 
 const Home: NextPage = () => {
   const { address } = useAccount();
+  const { chain } = useNetwork();
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState<getTokensQuery>();
   const [streams, setStreams] = useState<getStreamsQuery>();
   const [flowSplitters, setFlowSplitters] = useState<getFlowSplittersQuery>();
-
+  const [tokenMap, setTokenMap] = useState(
+    new Map<string, { name: string; symbol: string }>()
+  );
   useEffect(() => {
     (async () => {
       const tokens = await sdk.getTokens({ where: { isListed: true } });
       setTokens(tokens);
+      const tempTokenMap = tokenMap;
+      tokens.result.forEach((token) => {
+        tempTokenMap.set(token.id, { name: token.name, symbol: token.symbol });
+      });
+      setTokenMap(tempTokenMap);
       await getAndSetFlowSplittersAndStreams(address);
       setLoading(false);
     })();
@@ -49,11 +58,11 @@ const Home: NextPage = () => {
     connectedAddress?: string
   ) => {
     const flowSplitters = await sdk.getFlowSplitters({
-      where: {
-        flowSplitterCreator: connectedAddress
-          ? connectedAddress.toLowerCase()
-          : "",
-      },
+      // where: {
+      //   flowSplitterCreator: connectedAddress
+      //     ? connectedAddress.toLowerCase()
+      //     : "",
+      // },
     });
     setFlowSplitters(flowSplitters);
     const flowSplitterAddresses = flowSplitters.result.map((x) =>
@@ -87,7 +96,16 @@ const Home: NextPage = () => {
         <ConnectButton />
         <Summary />
         <Typography marginY={2} variant="body2" color="GrayText">
-          Factory Address: {FlowSplitterFactoryContract.address}
+          Factory Address:{" "}
+          <Link
+            target="_blank"
+            href={getAddressLink(
+              FlowSplitterFactoryContract.address,
+              chain?.id
+            )}
+          >
+            {FlowSplitterFactoryContract.address}
+          </Link>
         </Typography>
         {loading ? (
           <div>
@@ -98,6 +116,7 @@ const Home: NextPage = () => {
             <FlowSplitters
               address={address}
               flowSplitters={flowSplitters}
+              tokenMap={tokenMap}
               openModal={() => handleOpen()}
             />
             <Streams streams={streams} />

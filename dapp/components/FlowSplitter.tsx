@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardContent,
+  Link,
   TextField,
   Typography,
 } from "@mui/material";
@@ -18,8 +19,13 @@ import {
 } from "../src/generated";
 import { FlowSplitter as FlowSplitterType } from "../.graphclient";
 import { getAddress, isAddress } from "viem";
-import { isValidPortionInput, tryCatchWrapper } from "../src/helpers";
+import {
+  getAddressLink,
+  isValidPortionInput,
+  tryCatchWrapper,
+} from "../src/helpers";
 import { CFAv1ForwarderContract } from "../src/constants";
+import { useNetwork } from "wagmi";
 
 type FlowSplitterPropsType = Pick<
   FlowSplitterType,
@@ -43,9 +49,12 @@ type ModifyFlowArgsType = readonly [
 interface FlowSplitterProps {
   readonly flowSplitter: FlowSplitterPropsType;
   readonly address?: `0x${string}`;
+  readonly tokenMap: Map<string, { name: string; symbol: string }>;
 }
 
 const FlowSplitter = (props: FlowSplitterProps) => {
+  const { chain } = useNetwork();
+
   const { flowSplitter } = props;
   const [sideReceiverPortion, setSideReceiverPortion] = useState("");
   const [flowRate, setFlowRate] = useState("");
@@ -68,7 +77,7 @@ const FlowSplitter = (props: FlowSplitterProps) => {
     return flowRate !== "" && Number(flowRate) > 1000;
   }, [flowRate]);
 
-  const { data, isFetchedAfterMount } = useCfAv1ForwarderGetFlowrate({
+  const { data: inflowToFlowSplitter } = useCfAv1ForwarderGetFlowrate({
     ...CFAv1ForwarderContract,
     args: [
       getAddress(flowSplitter.superToken),
@@ -77,7 +86,6 @@ const FlowSplitter = (props: FlowSplitterProps) => {
         : "0x",
       getAddress(flowSplitter.id),
     ],
-    // watch: true,
   });
 
   const modifyFlowArgs = [
@@ -95,7 +103,7 @@ const FlowSplitter = (props: FlowSplitterProps) => {
   const { config: createFlowConfig } = usePrepareCfAv1ForwarderCreateFlow({
     ...CFAv1ForwarderContract,
     args: modifyFlowArgs,
-    enabled: more && isValidFlowRate && Number(data) === 0,
+    enabled: more && isValidFlowRate && Number(inflowToFlowSplitter) === 0,
   });
   const { writeAsync: createFlowWrite } =
     useCfAv1ForwarderCreateFlow(createFlowConfig);
@@ -103,15 +111,15 @@ const FlowSplitter = (props: FlowSplitterProps) => {
   const { config: updateFlowConfig } = usePrepareCfAv1ForwarderUpdateFlow({
     ...CFAv1ForwarderContract,
     args: modifyFlowArgs,
-    enabled: more && isValidFlowRate && Number(data) > 0,
+    enabled: more && isValidFlowRate && Number(inflowToFlowSplitter) > 0,
   });
   const { writeAsync: updateFlowWrite } =
     useCfAv1ForwarderUpdateFlow(updateFlowConfig);
 
   const handleStreamToFlowSplitter = async () => {
-    if (data == null) return;
+    if (inflowToFlowSplitter == null) return;
 
-    if (Number(data) === 0) {
+    if (Number(inflowToFlowSplitter) === 0) {
       await tryCatchWrapper(createFlowWrite);
     } else {
       await tryCatchWrapper(updateFlowWrite);
@@ -132,22 +140,49 @@ const FlowSplitter = (props: FlowSplitterProps) => {
     useFlowSplitterUpdateSplit(updateSplitConfig);
 
   return (
-    <Card key={flowSplitter.id} style={{ marginBottom: 10 }}>
+    <Card key={flowSplitter.id} style={{ marginBottom: 10, width: 500 }}>
       <CardContent>
-        <Typography variant="body2">Address: {flowSplitter.id}</Typography>
         <Typography variant="body2">
-          Token: {flowSplitter.superToken}
+          Address:{" "}
+          <Link
+            target="_blank"
+            href={getAddressLink(flowSplitter.id, chain?.id)}
+          >
+            {flowSplitter.id}
+          </Link>
         </Typography>
         <Typography variant="body2">
-          Main: {flowSplitter.mainReceiver} |{" "}
-          {toPct(flowSplitter.mainReceiverPortion)}
+          Token: {props.tokenMap.get(flowSplitter.superToken)?.symbol} |{" "}
+          {props.tokenMap.get(flowSplitter.superToken)?.name}
         </Typography>
         <Typography variant="body2">
-          Side: {flowSplitter.sideReceiver} |{" "}
-          {toPct(flowSplitter.sideReceiverPortion)}
+          Main:{" "}
+          <Link
+            target="_blank"
+            href={getAddressLink(flowSplitter.mainReceiver, chain?.id)}
+          >
+            {flowSplitter.mainReceiver}
+          </Link>{" "}
+          | {toPct(flowSplitter.mainReceiverPortion)}
+        </Typography>
+        <Typography variant="body2">
+          Side:{" "}
+          <Link
+            target="_blank"
+            href={getAddressLink(flowSplitter.sideReceiver, chain?.id)}
+          >
+            {flowSplitter.sideReceiver}
+          </Link>{" "}
+          | {toPct(flowSplitter.sideReceiverPortion)}
         </Typography>
         <Typography marginBottom={1} variant="body2">
-          Creator: {flowSplitter.flowSplitterCreator}
+          Creator:{" "}
+          <Link
+            target="_blank"
+            href={getAddressLink(flowSplitter.flowSplitterCreator, chain?.id)}
+          >
+            {flowSplitter.flowSplitterCreator}
+          </Link>
         </Typography>
         <Button variant="contained" size="small" onClick={() => setMore(!more)}>
           {more ? "Less" : "More"}
@@ -182,7 +217,7 @@ const FlowSplitter = (props: FlowSplitterProps) => {
               fullWidth
               size="small"
               id="update-side-receiver-portion"
-              label="Side Receiver Portion (1-999)"
+              label="Side Receiver Portion (1 - 999)"
               variant="outlined"
               value={sideReceiverPortion}
               error={!isValidSideReceiverPortion && sideReceiverPortion !== ""}

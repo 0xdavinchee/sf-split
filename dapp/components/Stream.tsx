@@ -1,4 +1,4 @@
-import { Button, Card, CardContent, Typography } from "@mui/material";
+import { Button, Card, CardContent, Link, Typography } from "@mui/material";
 import { Account, Stream as StreamType, Token } from "../.graphclient";
 import { formatEther, getAddress, isAddress } from "viem";
 import {
@@ -6,7 +6,8 @@ import {
   usePrepareCfAv1ForwarderDeleteFlow,
 } from "../src/generated";
 import { CFAv1ForwarderContract } from "../src/constants";
-import { tryCatchWrapper } from "../src/helpers";
+import { getAddressLink, tryCatchWrapper } from "../src/helpers";
+import { useNetwork } from "wagmi";
 
 type StreamProps = Pick<
   StreamType,
@@ -18,6 +19,7 @@ type StreamProps = Pick<
 };
 
 const Stream = (props: StreamProps) => {
+  const { chain } = useNetwork();
   const getFormattedFlowRate = (flowRate: string) => {
     return formatEther(BigInt(flowRate));
   };
@@ -37,14 +39,16 @@ const Stream = (props: StreamProps) => {
 
   return (
     <Card key={props.id} style={{ marginBottom: 10 }}>
-      <CardContent>
+      <CardContent style={{ width: 500 }}>
         <Typography variant="body2">
-          {props.sender.id} streaming to {props.receiver.id}
-        </Typography>
-        <Typography variant="body2"></Typography>
-        <Typography variant="body2">
-          @ {getFormattedFlowRate(props.currentFlowRate)} {props.token.symbol} /
-          second
+          You are streaming {getFormattedFlowRate(props.currentFlowRate)}{" "}
+          {props.token.symbol} / second to{" "}
+          <Link
+            target="_blank"
+            href={getAddressLink(props.receiver.id, chain?.id)}
+          >
+            {props.receiver.id}
+          </Link>
         </Typography>
         <Button
           style={{ marginTop: 10 }}
