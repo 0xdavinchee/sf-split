@@ -15,7 +15,7 @@ export const getNetworkLink = (network?: number) => {
     case 80001:
       return "https://mumbai.polygonscan.com";
     default:
-      return "";
+      return "https://mumbai.polygonscan.com";
   }
 };
 
