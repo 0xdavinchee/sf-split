@@ -7,7 +7,6 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "gc-start": "ts-node index.ts --transpileOnly",
     "gc-codegen": "graphclient build",
     "gc-dev": "graphclient serve-dev",
     "wagmi": "wagmi generate"

@@ -28,14 +28,12 @@ const Home: NextPage = () => {
   const [flowSplitters, setFlowSplitters] = useState<getFlowSplittersQuery>();
 
   useEffect(() => {
-    if (address) {
-      (async () => {
-        const tokens = await sdk.getTokens({ where: { isListed: true } });
-        setTokens(tokens);
-        await getAndSetFlowSplittersAndStreams(address);
-        setLoading(false);
-      })();
-    }
+    (async () => {
+      const tokens = await sdk.getTokens({ where: { isListed: true } });
+      setTokens(tokens);
+      await getAndSetFlowSplittersAndStreams(address);
+      setLoading(false);
+    })();
   }, [address]);
 
   useEffect(() => {
@@ -71,7 +69,6 @@ const Home: NextPage = () => {
     setStreams(streams);
   };
 
-  console.log(modalOpen);
   const handleOpen = () => setModalOpen(true);
   const handleClose = () => setModalOpen(false);
 
@@ -106,14 +103,12 @@ const Home: NextPage = () => {
             <Streams streams={streams} />
           </div>
         )}
-        <Modal
+        <CreateFlowSplitter
           open={modalOpen}
-          onClose={handleClose}
-          aria-labelledby="modal-create-flow-splitter"
-          aria-describedby="modal-create-flow-splitters"
-        >
-          <CreateFlowSplitter address={address} tokens={tokens} />
-        </Modal>
+          address={address}
+          tokens={tokens}
+          handleClose={() => handleClose()}
+        />
       </main>
 
       <footer className={styles.footer}>

@@ -1,17 +1,12 @@
-import {
-  Typography,
-  Card,
-  CardContent,
-  Button,
-} from "@mui/material";
+import { Typography, Card, CardContent, Button } from "@mui/material";
 import FlowSplitter from "./FlowSplitter";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { getFlowSplittersQuery } from "../.graphclient";
 
 export interface FlowSplittersProps {
   readonly openModal: () => void;
   readonly flowSplitters?: getFlowSplittersQuery;
-  readonly address?: string;
+  readonly address?: `0x${string}`;
 }
 
 const FlowSplitters = (props: FlowSplittersProps) => {
@@ -47,7 +42,11 @@ const FlowSplitters = (props: FlowSplittersProps) => {
           ) : (
             <div>
               {props.flowSplitters?.result.map((x) => (
-                <FlowSplitter key={x.id} {...x} />
+                <FlowSplitter
+                  key={x.id}
+                  address={props.address}
+                  flowSplitter={x}
+                />
               ))}
               <Button
                 style={{ marginTop: 10 }}

@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, Typography } from "@mui/material";
 import { Account, Stream as StreamType, Token } from "../.graphclient";
-import { formatEther, getAddress } from "viem";
+import { formatEther, getAddress, isAddress } from "viem";
 import {
   useCfAv1ForwarderDeleteFlow,
   usePrepareCfAv1ForwarderDeleteFlow,
@@ -25,9 +25,9 @@ const Stream = (props: StreamProps) => {
   const { config: deleteFlowConfig } = usePrepareCfAv1ForwarderDeleteFlow({
     ...CFAv1ForwarderContract,
     args: [
-      getAddress(props.token.id),
-      getAddress(props.sender.id),
-      getAddress(props.receiver.id),
+      isAddress(props.token.id) ? getAddress(props.token.id) : "0x",
+      isAddress(props.sender.id) ? getAddress(props.sender.id) : "0x",
+      isAddress(props.receiver.id) ? getAddress(props.receiver.id) : "0x",
       "0x",
     ],
   });
