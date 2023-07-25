@@ -4,11 +4,11 @@ const Summary = () => {
   return (
     <Paper elevation={3} style={{ marginTop: 10, padding: 10 }}>
       <Typography maxWidth={420} marginY={0.5} variant="body2">
-        This is a dApp which allows you to deploy Flow Splitter Smart Contracts
+        This is a dApp which allows you to deploy Flow Splitter smart contracts
         using the Flow Splitter Factory.
       </Typography>
       <Typography maxWidth={420} marginY={0.5} variant="body2">
-        The flow splitter contract allows you to send a stream to the contract
+        The Flow Splitter contract allows you to send a stream to the contract
         and split the incoming flow rate between two recipients.
       </Typography>
       <Typography maxWidth={420} marginY={0.5} variant="body2">
