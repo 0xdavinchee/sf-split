@@ -10,19 +10,25 @@ import {
 } from "../.graphclient";
 import { useEffect, useState } from "react";
 import { Link, Paper, Typography } from "@mui/material";
-import { useAccount, useNetwork } from "wagmi";
+import { useAccount, useNetwork, usePublicClient } from "wagmi";
 import FlowSplitters from "../components/FlowSplitters";
 import CreateFlowSplitter from "../components/CreateFlowSplitter";
 import Streams from "../components/Streams";
-import { FlowSplitterFactoryContract } from "../src/constants";
+import {
+  ConstantFlowAgreementV1Contract,
+  FlowSplitterFactoryContract,
+  fromBlock,
+} from "../src/constants";
 import Summary from "../components/Summary";
 import { getAddressLink } from "../src/helpers";
+import { parseAbiItem } from "viem";
 
 const sdk = getBuiltGraphSDK();
-
 const Home: NextPage = () => {
   const { address } = useAccount();
   const { chain } = useNetwork();
+  const publicClient = usePublicClient();
+
   const [modalOpen, setModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [tokens, setTokens] = useState<getTokensQuery>();
@@ -55,27 +61,83 @@ const Home: NextPage = () => {
   }, [loading, address]);
 
   const getAndSetFlowSplittersAndStreams = async (
-    connectedAddress?: string
+    connectedAddress?: `0x${string}`
   ) => {
-    const flowSplitters = await sdk.getFlowSplitters({
-      // where: {
-      //   flowSplitterCreator: connectedAddress
-      //     ? connectedAddress.toLowerCase()
-      //     : "",
-      // },
+    const subgraphFlowSplitters = await sdk.getFlowSplitters({
+      where: {
+        flowSplitterCreator: connectedAddress
+          ? connectedAddress.toLowerCase()
+          : "0x0000000000000000000000000000000000000000",
+      },
     });
-    setFlowSplitters(flowSplitters);
-    const flowSplitterAddresses = flowSplitters.result.map((x) =>
-      x.id.toLowerCase()
+    const flowSplitterLogs = await publicClient.getLogs({
+      address: FlowSplitterFactoryContract.address,
+      fromBlock,
+      event: parseAbiItem(
+        "event FlowSplitterCreated(address indexed superToken, address indexed flowSplitterCreator, address mainReceiver, address sideReceiver, address flowSplitter, int96 mainReceiverPortion, int96 sideReceiverPortion)"
+      ),
+      args: {
+        flowSplitterCreator: connectedAddress,
+      },
+    });
+    const flowSplittersLogData = {
+      result: flowSplitterLogs.map((x) => ({
+        ...x.args,
+        id: x.args.flowSplitter,
+      })),
+    };
+    const flowSplitterData =
+      flowSplittersLogData.result.length > subgraphFlowSplitters.result.length
+        ? flowSplittersLogData
+        : subgraphFlowSplitters;
+
+    setFlowSplitters(
+      connectedAddress ? (flowSplitterData as any) : { result: [] }
     );
-    const streams = await sdk.getStreams({
+    const flowSplitterAddresses = flowSplitterData.result.map((x) =>
+      x.id?.toLowerCase()
+    );
+    const flowUpdatedLogs = await publicClient.getLogs({
+      address: ConstantFlowAgreementV1Contract.address,
+      fromBlock,
+      event: parseAbiItem(
+        "event FlowUpdated(address indexed token,address indexed sender,address indexed receiver,int96 flowRate,int256 totalSenderFlowRate,int256 totalReceiverFlowRate,bytes userData)"
+      ),
+      args: {
+        sender: connectedAddress,
+      },
+    });
+    const flowUpdatedLogData = {
+      result: flowUpdatedLogs
+        .map((x) => ({
+          token: {
+            id: x.args.token,
+          },
+          sender: {
+            id: x.args.sender,
+          },
+          receiver: {
+            id: x.args.receiver,
+          },
+          currentFlowRate: x.args.flowRate,
+          id: x.transactionHash,
+        }))
+        .filter((x) =>
+          flowSplitterAddresses.includes(x.receiver.id?.toLowerCase() || "")
+        ),
+    };
+    const subgraphStreams = await sdk.getStreams({
       where: {
         currentFlowRate_gt: 0,
         sender: connectedAddress ? connectedAddress.toLowerCase() : "",
         receiver_in: flowSplitterAddresses,
       },
     });
-    setStreams(streams);
+    const streamData =
+      flowUpdatedLogData.result.length > subgraphStreams.result.length
+        ? flowUpdatedLogData
+        : subgraphStreams;
+    setStreams(connectedAddress ? streamData as any : { result: [] });
   };
 
   const handleOpen = () => setModalOpen(true);
@@ -119,7 +181,7 @@ const Home: NextPage = () => {
               tokenMap={tokenMap}
               openModal={() => handleOpen()}
             />
-            <Streams streams={streams} />
+            <Streams streams={streams} tokenMap={tokenMap} />
           </div>
         )}
         <CreateFlowSplitter

@@ -96,6 +96,8 @@ contract FlowSplitter is SuperAppBaseFlow {
         if (newSideReceiverPortion_ <= 0 || newSideReceiverPortion_ == 1000) revert INVALID_PORTION();
         if (msg.sender != CREATOR) revert NOT_CREATOR();
 
+        int96 sideReceiverPortionBefore = sideReceiverPortion;
+
         sideReceiverPortion = newSideReceiverPortion_;
 
         // get current outflow rate
@@ -105,16 +107,9 @@ contract FlowSplitter is SuperAppBaseFlow {
         int96 mainReceiverPortion = 1000 - newSideReceiverPortion_;
 
         // update outflows
-        // @note there was a peculiar bug here where decreasing the portion doesn't always work
-        // as the flow sent to main receiver is greater than before while the side receiver portion is
-        // the same. this leads to the super app reverting due to not enough buffer to do so.
-        if (mainReceiverPortion > newSideReceiverPortion_) {
-            ACCEPTED_SUPER_TOKEN.updateFlow(MAIN_RECEIVER, (totalOutflowRate * mainReceiverPortion) / 1000);
-            ACCEPTED_SUPER_TOKEN.updateFlow(SIDE_RECEIVER, (totalOutflowRate * newSideReceiverPortion_) / 1000);
-        } else {
-            ACCEPTED_SUPER_TOKEN.updateFlow(SIDE_RECEIVER, (totalOutflowRate * newSideReceiverPortion_) / 1000);
-            ACCEPTED_SUPER_TOKEN.updateFlow(MAIN_RECEIVER, (totalOutflowRate * mainReceiverPortion) / 1000);
-        }
+        // @note there is a peculiar bug here where you can't change the outflow in any way
+        ACCEPTED_SUPER_TOKEN.updateFlow(MAIN_RECEIVER, (totalOutflowRate * mainReceiverPortion) / 1000);
+        ACCEPTED_SUPER_TOKEN.updateFlow(SIDE_RECEIVER, (totalOutflowRate * newSideReceiverPortion_) / 1000);
 
         emit SplitUpdated(mainReceiverPortion, newSideReceiverPortion_);
     }

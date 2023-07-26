@@ -30,4 +30,4 @@ source .env
 # To deploy and verify our contract
 forge script script/FlowSplitterFactory.s.sol:FlowSplitterFactoryScript --rpc-url $RPC_URL --broadcast --verify -vvvv
 ```
-> NOTE: some chains don't have EIP1559 support and thus require the `--legacy` flag
+> NOTE: some chains (like Mumbai) don't have EIP1559 support and thus require the `--legacy` flag

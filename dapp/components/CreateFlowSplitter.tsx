@@ -76,6 +76,7 @@ const CreateFlowSplitter = (props: CreateFlowSplitterProps) => {
 
   useEffect(() => {
     if (data) {
+      setHash("0x");
       props.handleClose();
     }
   }, [data, props]);

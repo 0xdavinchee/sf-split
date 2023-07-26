@@ -1,14 +1,6 @@
-import {
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  ToggleButton,
-} from "@mui/material";
-import CheckIcon from "@mui/icons-material/Check";
+import { Typography, Card, CardContent, Button } from "@mui/material";
 import FlowSplitter from "./FlowSplitter";
 import { getFlowSplittersQuery } from "../.graphclient";
-import { useMemo, useState } from "react";
 
 export interface FlowSplittersProps {
   readonly address?: `0x${string}`;
@@ -18,17 +10,6 @@ export interface FlowSplittersProps {
 }
 
 const FlowSplitters = (props: FlowSplittersProps) => {
-  const [selected, setSelected] = useState(false);
-  const filteredSplitters = useMemo(() => {
-    if (selected) {
-      return props.flowSplitters?.result.filter(
-        (x) => x.flowSplitterCreator === props.address?.toLowerCase()
-      );
-    } else {
-      return props.flowSplitters?.result;
-    }
-  }, [selected, props.flowSplitters, props.address]);
-
   return (
     <div>
       <Typography marginBottom={1} variant="h4">
@@ -52,23 +33,7 @@ const FlowSplitters = (props: FlowSplittersProps) => {
             </div>
           ) : (
             <div>
-              <CardContent>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                  <ToggleButton
-                    value="check"
-                    selected={selected}
-                    onChange={() => {
-                      setSelected(!selected);
-                    }}
-                  >
-                    <CheckIcon fontSize="small" />
-                  </ToggleButton>
-                  <Typography marginLeft={1} variant="body1">
-                    Only display my deployed flow splitters
-                  </Typography>
-                </div>
-              </CardContent>
-              {filteredSplitters?.map((x) => (
+              {props.flowSplitters?.result.map((x) => (
                 <FlowSplitter
                   key={x.id}
                   address={props.address}

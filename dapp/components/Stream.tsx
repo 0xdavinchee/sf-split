@@ -9,7 +9,7 @@ import { CFAv1ForwarderContract } from "../src/constants";
 import { getAddressLink, tryCatchWrapper } from "../src/helpers";
 import { useNetwork } from "wagmi";
 
-type StreamProps = Pick<
+type StreamPropsType = Pick<
   StreamType,
   "id" | "updatedAtTimestamp" | "currentFlowRate"
 > & {
@@ -17,6 +17,11 @@ type StreamProps = Pick<
   sender: Pick<Account, "id">;
   receiver: Pick<Account, "id">;
 };
+
+interface StreamProps {
+  readonly stream: StreamPropsType;
+  readonly tokenMap: Map<string, { name: string; symbol: string }>;
+}
 
 const Stream = (props: StreamProps) => {
   const { chain } = useNetwork();
@@ -27,38 +32,39 @@ const Stream = (props: StreamProps) => {
   const { config: deleteFlowConfig } = usePrepareCfAv1ForwarderDeleteFlow({
     ...CFAv1ForwarderContract,
     args: [
-      isAddress(props.token.id) ? getAddress(props.token.id) : "0x",
-      isAddress(props.sender.id) ? getAddress(props.sender.id) : "0x",
-      isAddress(props.receiver.id) ? getAddress(props.receiver.id) : "0x",
+      isAddress(props.stream.token.id)
+        ? getAddress(props.stream.token.id)
+        : "0x",
+      isAddress(props.stream.sender.id)
+        ? getAddress(props.stream.sender.id)
+        : "0x",
+      isAddress(props.stream.receiver.id)
+        ? getAddress(props.stream.receiver.id)
+        : "0x",
       "0x",
     ],
   });
+
+  const symbol = props.tokenMap.get(
+    props.stream.token.id.toLowerCase()
+  )?.symbol;
 
   const { writeAsync: deleteFlowWrite } =
     useCfAv1ForwarderDeleteFlow(deleteFlowConfig);
 
   return (
-    <Card key={props.id} style={{ marginBottom: 10 }}>
-      <CardContent style={{ width: 500 }}>
+    <Card key={props.stream.id} style={{ marginBottom: 10, width: 500 }}>
+      <CardContent>
         <Typography variant="body2">
-          You are streaming {getFormattedFlowRate(props.currentFlowRate)}{" "}
-          {props.token.symbol} / second to{" "}
+          You are streaming {getFormattedFlowRate(props.stream.currentFlowRate)}{" "}
+          {symbol} / second to{" "}
           <Link
             target="_blank"
-            href={getAddressLink(props.receiver.id, chain?.id)}
+            href={getAddressLink(props.stream.receiver.id, chain?.id)}
           >
-            {props.receiver.id}
+            {props.stream.receiver.id}
           </Link>
         </Typography>
-        <Button
-          style={{ marginTop: 10 }}
-          size="small"
-          variant="contained"
-          color="error"
-          onClick={() => tryCatchWrapper(deleteFlowWrite)}
-        >
-          Close Stream
-        </Button>
       </CardContent>
     </Card>
   );

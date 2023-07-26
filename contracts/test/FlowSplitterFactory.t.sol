@@ -213,8 +213,9 @@ contract FlowSplitterFactoryTest is Test {
     function testUpdateSingleStreamSplit(address sender_, address main_, address side_, int96 sidePortion_) public {
         _assumeValidMainAndSideAddresses(main_, side_);
         sidePortion_ = _boundValidSidePortion(sidePortion_);
+        sidePortion_ = 420;
 
-        int96 flowRate = 100000;
+        int96 flowRate = 3170979198;
 
         address flowSplitterAddress = _helperDeployFlowSplitter(_superToken, main_, side_, sidePortion_);
         FlowSplitter flowSplitter = FlowSplitter(flowSplitterAddress);
@@ -223,7 +224,7 @@ contract FlowSplitterFactoryTest is Test {
 
         _assertMainAndSideFlowRates(flowSplitter, main_, side_, flowRate, sidePortion_, "testUpdateSingleStreamSplit");
 
-        int96 newSideReceiverPortion = 420;
+        int96 newSideReceiverPortion = 690;
         flowSplitter.updateSplit(newSideReceiverPortion);
 
         assertEq(

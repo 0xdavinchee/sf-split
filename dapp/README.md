@@ -9,7 +9,9 @@ First install dependencies: `pnpm install`.
 
 To run the development server: `pnpm dev`. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-To build: `pnpm build`.
+To build: `pnpm build`, this builds both the graph client SDK as well as building the Next app.
+
+If you want to add in more hooks, add the contract ABI's you'd like hooks for to the `abis` folder and run `pnpm wagmi` to generate wagmi hooks with `@wagmi/cli`.
 
 ## Deploy on Vercel
 
