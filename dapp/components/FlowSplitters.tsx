@@ -22,7 +22,7 @@ const FlowSplitters = (props: FlowSplittersProps) => {
   const filteredSplitters = useMemo(() => {
     if (selected) {
       return props.flowSplitters?.result.filter(
-        (x) => x.flowSplitterCreator === props.address
+        (x) => x.flowSplitterCreator === props.address?.toLowerCase()
       );
     } else {
       return props.flowSplitters?.result;
