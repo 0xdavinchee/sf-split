@@ -7,11 +7,11 @@ export const CFAv1ForwarderContract = {
 
 export const FlowSplitterFactoryContract = {
   flowSplitterFactoryABI,
-  address: "0xa3b41052333e5f1f8da5ce8a4d80717715143325" as any,
+  address: "0xc00593ad6ffe7edcaf4ea6be91ed57a8465b0467" as any,
 };
 
 export const ConstantFlowAgreementV1Contract = {
   address: "0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873" as any,
 };
 
-export const fromBlock = BigInt(38313711);
+export const fromBlock = BigInt(38314457);

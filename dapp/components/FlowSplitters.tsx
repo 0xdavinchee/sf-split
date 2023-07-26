@@ -17,7 +17,7 @@ const FlowSplitters = (props: FlowSplittersProps) => {
       </Typography>
       <Card elevation={3}>
         <CardContent>
-          {props.flowSplitters?.result.length === 0 ? (
+          {props.flowSplitters?.result?.length === 0 ? (
             <div>
               <Typography color="GrayText" variant="body2">
                 There are no flow splitters to display.
