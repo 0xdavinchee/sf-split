@@ -47,3 +47,6 @@ This technical design outlines the key components, from smart contracts and subg
 ## Misc
 
 [FlowSplitter contract changeset](https://github.com/superfluid-finance/super-examples/compare/flow-splitter-changes?expand=1)
+[FlowSplitter dApp](https://sf-split.vercel.app/)
+
+Please refer to the README's in contracts, dapp and subgraph for more information on how to work with the code.
